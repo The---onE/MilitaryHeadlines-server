@@ -10,7 +10,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>添加文章</title>
+<title>登录</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -21,59 +21,53 @@
 <link href="<%=basePath%>css/learunui-login.css" rel="stylesheet" />
 <link href="<%=basePath%>css/zzsc.css" rel="stylesheet" />
 <script src="<%=basePath%>js/jquery-1.8.1.min.js"></script>
-
 </head>
 
-<body style="background:#8899BB">
-<div style="text-align: center">
-<h1 style="font-size:42">添加文章</h1>
-	标题:
-	<input id="title" type="text" />
-	<br /> 作者:
-	<input id="author" type="text" />
-	<br /> 类别:
-	<input id="category" type="text" />
-	<br /> 内容:
-	<textarea id="content" rows="8" cols="60"></textarea>
-	<br />
-	<input id="confirm" type="button" value="提交" />
-	<input id="cancel" type="button" value="取消" />
+<body class="Loginbody">
+	<div class="logo" style="color:white;">
+		<div>
+			<div style="height: 50px; text-align: center; width:380px;">
+				<div>
+					<span style="font-size: 24px;width:310px;">军 事 头 条 管 理 系 统</span>
+				</div>
+			</div>
+		</div>
 	</div>
-
+	<div class="content">
+		<div class="Loginform">
+			<div class="form-message"></div>
+			<div class="form-account">
+				账户 <input id="txtaccount" type="text" />
+			</div>
+			<div class="form-password">
+				密码 <input id="txtpassword" type="password" />
+			</div>
+			<div class="form-bottom">
+				<div id="btlogin" class="btlogin"></div>
+			</div>
+		</div>
+	</div>
 	<script>
-		$('#confirm').click(function() {
-			var title = $('#title').val();
-			var author = $('#author').val();
-			var category = $('#category').val();
-			var content = $('#content').val();
+		$('#btlogin').click(function() {
+			var username = $('#txtaccount').val();
+			var password = $('#txtpassword').val();
 			$.ajax({
-				url : '<%=basePath%>AddArticle',
+				url : '<%=basePath%>AdminLogin',
 				type : 'post',
 				data : {
-					title : title,
-					author : author,
-					category : category,
-					content : content
+					username : username,
+					password : password
 				},
 				dataType : 'json',
 				success : function(data) {
 					if (data.status == 1) {
-						alert('添加成功')
-						$('#title').val('');
-						$('#author').val('');
-						$('#category').val('');
-						$('#content').val('');
+						alert('登录成功')
+						window.location.href = '<%=basePath%>page/AddArticle.jsp';
 					} else {
 						alert(data.prompt);
 					}
 				}
 			})
-		})
-		$('#cancel').click(function() {
-			$('#title').val('');
-			$('#author').val('');
-			$('#category').val('');
-			$('#content').val('');
 		})
 	</script>
 </body>

@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -43,6 +44,8 @@ public class AddArticle extends HttpServlet {
 		try {
 			response.setContentType("text/html;charset=utf-8");
 			request.setCharacterEncoding("UTF-8");
+			HttpSession session = request.getSession();
+			Object userId = session.getAttribute("userId");
 
 			String title = request.getParameter("title");
 			String author = request.getParameter("author");
@@ -50,27 +53,32 @@ public class AddArticle extends HttpServlet {
 			String content = request.getParameter("content");
 
 			JSONObject res = new JSONObject();
-			if (!Constants.isEmpty(title) && !Constants.isEmpty(author) && !Constants.isEmpty(category)
-					&& !Constants.isEmpty(content)) {
-				int aId = articleDao.addArticle(title, author, category);
-				if (aId > 0) {
-					int id = articleContentDao.addArticleContent(aId, content);
-					if (id > 0) {
+			if (userId != null) {
+				if (!Constants.isEmpty(title) && !Constants.isEmpty(author) && !Constants.isEmpty(category)
+						&& !Constants.isEmpty(content)) {
+					int aId = articleDao.addArticle(title, author, category);
+					if (aId > 0) {
+						int id = articleContentDao.addArticleContent(aId, content);
+						if (id > 0) {
+							res.put(Constants.RESPONSE_STATUS, Constants.STATUS_EXECUTE_SUCCESS);
+							res.put(Constants.RESPONSE_PROMPT, "添加成功");
+						} else {
+							res.put(Constants.RESPONSE_STATUS, Constants.STATUS_ERROR);
+							res.put(Constants.RESPONSE_PROMPT, "添加失败");
+						}
 						res.put(Constants.RESPONSE_STATUS, Constants.STATUS_EXECUTE_SUCCESS);
 						res.put(Constants.RESPONSE_PROMPT, "添加成功");
 					} else {
 						res.put(Constants.RESPONSE_STATUS, Constants.STATUS_ERROR);
 						res.put(Constants.RESPONSE_PROMPT, "添加失败");
 					}
-					res.put(Constants.RESPONSE_STATUS, Constants.STATUS_EXECUTE_SUCCESS);
-					res.put(Constants.RESPONSE_PROMPT, "添加成功");
 				} else {
 					res.put(Constants.RESPONSE_STATUS, Constants.STATUS_ERROR);
-					res.put(Constants.RESPONSE_PROMPT, "添加失败");
+					res.put(Constants.RESPONSE_PROMPT, "缺少参数");
 				}
 			} else {
 				res.put(Constants.RESPONSE_STATUS, Constants.STATUS_ERROR);
-				res.put(Constants.RESPONSE_PROMPT, "缺少参数");
+				res.put(Constants.RESPONSE_PROMPT, "请先登录");
 			}
 
 			response.getWriter().append(res.toString());
